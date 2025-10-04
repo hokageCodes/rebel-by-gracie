@@ -187,7 +187,7 @@ export default function VerifyOtpPage() {
 
           <div className="text-center">
             <p className="text-sm text-gray-600">
-              Didn't receive the code?{' '}
+              Didnt receive the code?{' '}
               <button
                 type="button"
                 onClick={handleResendCode}

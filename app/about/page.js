@@ -35,14 +35,14 @@ export default function AboutPage() {
                 </p>
                 <p>
                   We carefully curate each piece in our collection, working with skilled artisans 
-                  who share our commitment to excellence. From the Womens Collection featuring 
-                  elegant RG Midi and Mini handbags to our sophisticated Men's Collection with 
+                  who share our commitment to excellence. From the Women&apos;s Collection featuring 
+                  elegant RG Midi and Mini handbags to our sophisticated Men&apos;s Collection with 
                   professional briefcases and laptop bags, every item tells a story of quality and refinement.
                 </p>
                 <p>
                   Our Travel Collection ensures that your adventures are accompanied by durable, 
                   stylish luggage that makes a statement wherever you go. At RebelByGrace, we 
-                  believe that true luxury lies in the details he perfect stitch, the finest 
+                  believe that true luxury lies in the details&mdash;the perfect stitch, the finest 
                   materials, and the thoughtful design that anticipates your needs.
                 </p>
               </div>
@@ -149,7 +149,7 @@ export default function AboutPage() {
                   </svg>
                 </div>
                 <h3 className="text-xl font-semibold text-secondary-900 mb-2">
-                  Women's Collection
+                  Women&apos;s Collection
                 </h3>
                 <p className="text-secondary-600 mb-4">
                   Elegant handbags and accessories designed for the modern woman who values 
@@ -174,10 +174,10 @@ export default function AboutPage() {
                   </svg>
                 </div>
                 <h3 className="text-xl font-semibold text-secondary-900 mb-2">
-                  Men's Collection
+                  Men&apos;s Collection
                 </h3>
                 <p className="text-secondary-600 mb-4">
-                  Professional and stylish bags that complement the modern mans lifestyle 
+                  Professional and stylish bags that complement the modern man&apos;s lifestyle 
                   and career aspirations.
                 </p>
                 <ul className="text-sm text-secondary-500 space-y-1">
@@ -223,10 +223,10 @@ export default function AboutPage() {
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <a href="/collections/womens" className="btn-primary bg-white text-primary-600 hover:bg-secondary-100">
-              Shop Women's Collection
+              Shop Women&apos;s Collection
             </a>
             <a href="/collections/mens" className="btn-outline border-white text-white hover:bg-white hover:text-primary-600">
-              Shop Men's Collection
+              Shop Men&apos;s Collection
             </a>
           </div>
         </div>

@@ -99,9 +99,10 @@ export default function WomensCollectionPage() {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Hero Section */}
-      <div className="bg-gradient-to-r from-pink-600 to-purple-700 text-white py-20">
+     {/* Hero Section */}
+     <div className="bg-gradient-to-r from-pink-600 to-purple-700 text-white py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h1 className="text-4xl md:text-6xl font-bold mb-6">Women's Collection</h1>
+          <h1 className="text-4xl md:text-6xl font-bold mb-6">Women&apos;s Collection</h1>
           <p className="text-xl md:text-2xl text-pink-100 max-w-3xl mx-auto">
             Discover our elegant collection of handbags, purses, and accessories designed for the modern woman
           </p>
@@ -134,52 +135,10 @@ export default function WomensCollectionPage() {
                 </svg>
               </li>
               <li>
-                <span className="text-gray-500">Women's Collection</span>
+                <span className="text-gray-500">Women&apos;s Collection</span>
               </li>
             </ol>
           </nav>
-        </div>
-      </div>
-
-      {/* Filters */}
-      <div className="bg-white border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between space-y-4 md:space-y-0">
-            <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-4">
-              <select
-                value={filters.category}
-                onChange={(e) => setFilters(prev => ({ ...prev, category: e.target.value }))}
-                className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-              >
-                {categories.map((category) => (
-                  <option key={category.value} value={category.value}>
-                    {category.label}
-                  </option>
-                ))}
-              </select>
-
-              <select
-                value={filters.sort}
-                onChange={(e) => setFilters(prev => ({ ...prev, sort: e.target.value }))}
-                className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-              >
-                <option value="newest">Newest First</option>
-                <option value="price-low">Price: Low to High</option>
-                <option value="price-high">Price: High to Low</option>
-                <option value="name">Name A-Z</option>
-              </select>
-            </div>
-
-            <div className="flex-1 max-w-md">
-              <input
-                type="text"
-                placeholder="Search products..."
-                value={filters.search}
-                onChange={(e) => setFilters(prev => ({ ...prev, search: e.target.value }))}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-              />
-            </div>
-          </div>
         </div>
       </div>
 
