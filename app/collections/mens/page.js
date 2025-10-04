@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 
 export default function MensCollectionPage() {
   const [products, setProducts] = useState([]);
@@ -96,7 +97,7 @@ export default function MensCollectionPage() {
       {/* Hero Section */}
       <div className="bg-gradient-to-r from-blue-600 to-indigo-700 text-white py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h1 className="text-4xl md:text-6xl font-bold mb-6">Men's Collection</h1>
+          <h1 className="text-4xl md:text-6xl font-bold mb-6">Mens Collection</h1>
           <p className="text-xl md:text-2xl text-blue-100 max-w-3xl mx-auto">
             Professional briefcases and laptop bags crafted for the discerning gentleman
           </p>
@@ -129,7 +130,7 @@ export default function MensCollectionPage() {
                 </svg>
               </li>
               <li>
-                <span className="text-gray-500">Men's Collection</span>
+                <span className="text-gray-500">Mens Collection</span>
               </li>
             </ol>
           </nav>
@@ -216,7 +217,7 @@ export default function MensCollectionPage() {
                       <div className="relative">
                         <div className="h-64 bg-gray-200 rounded-t-lg overflow-hidden">
                           {product.images && product.images.length > 0 ? (
-                            <img
+                            <Image
                               src={product.images[0].url}
                               alt={product.name}
                               className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"

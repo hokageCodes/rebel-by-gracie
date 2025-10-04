@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/lib/auth-context';
+import Image from 'next/image';
 
 export default function Navigation() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -116,7 +117,7 @@ export default function Navigation() {
               {/* Center Logo - Absolutely positioned, drops below nav */}
               <div className="absolute left-1/2 -translate-x-1/2 top-0 -mt-10">
                 <Link href="/" className="block">
-                    <img 
+                    <Image 
                       src="/rg-logonobg.png" 
                       alt="RebelByGrace Logo" 
                       className="h-48 w-48 object-contain"
@@ -217,7 +218,7 @@ export default function Navigation() {
           <div className="flex justify-between items-center h-16">
             {/* Mobile Logo */}
             <Link href="/" className="flex items-center">
-              <img 
+              <Image 
                 src="/rg-logonobg.png" 
                 alt="RebelByGrace" 
                 className="h-24 w-auto object-contain"
@@ -261,10 +262,10 @@ export default function Navigation() {
                   Home
                 </Link>
                 <Link href="/collections/womens" className="block px-3 py-2 text-secondary-700 hover:text-primary-600 hover:bg-secondary-50 rounded-md transition-colors">
-                  Women's Collection
+                  Womens Collection
                 </Link>
                 <Link href="/collections/mens" className="block px-3 py-2 text-secondary-700 hover:text-primary-600 hover:bg-secondary-50 rounded-md transition-colors">
-                  Men's Collection
+                  Mens Collection
                 </Link>
                 <Link href="/collections/travel" className="block px-3 py-2 text-secondary-700 hover:text-primary-600 hover:bg-secondary-50 rounded-md transition-colors">
                   Travel Collection

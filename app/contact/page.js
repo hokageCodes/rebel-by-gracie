@@ -52,7 +52,7 @@ export default function ContactPage() {
               Message Sent Successfully!
             </h2>
             <p className="text-secondary-600 mb-6">
-              Thank you for contacting us. We'll get back to you within 24 hours.
+              Thank you for contacting us. We will get back to you within 24 hours.
             </p>
             <button
               onClick={() => {
@@ -85,7 +85,7 @@ export default function ContactPage() {
               Contact Us
             </h1>
             <p className="text-xl md:text-2xl max-w-3xl mx-auto">
-              We'd love to hear from you. Get in touch with any questions or feedback.
+              We would love to hear from you. Get in touch with any questions or feedback.
             </p>
           </div>
         </div>

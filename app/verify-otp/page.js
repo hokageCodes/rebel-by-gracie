@@ -135,7 +135,7 @@ export default function VerifyOtpPage() {
             Verify Your Email
           </h2>
           <p className="mt-2 text-sm text-gray-600 text-center">
-            We've sent a 6-digit verification code to <strong>{email}</strong>
+            We have sent a 6-digit verification code to <strong>{email}</strong>
           </p>
         </div>
 

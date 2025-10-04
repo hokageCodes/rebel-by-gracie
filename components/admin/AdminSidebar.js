@@ -1,5 +1,7 @@
 'use client';
 
+import Image from "next/image";
+
 export default function AdminSidebar({ activeTab, setActiveTab }) {
   const menuItems = [
     {
@@ -45,7 +47,7 @@ export default function AdminSidebar({ activeTab, setActiveTab }) {
     <aside className="w-64 bg-white shadow-lg h-screen sticky top-0">
       <div className="p-6">
         <div className="flex items-center space-x-3 mb-8">
-          <img 
+          <Image 
             src="/rg-logonobg.png" 
             alt="RebelByGrace" 
             className="h-10 w-10 object-contain"

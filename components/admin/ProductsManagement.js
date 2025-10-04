@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import ProductForm from './ProductForm';
+import Image from 'next/image';
 
 export default function ProductsManagement() {
   const [products, setProducts] = useState([]);
@@ -206,7 +207,7 @@ export default function ProductsManagement() {
                           <div className="flex items-center">
                             <div className="w-12 h-12 bg-gray-200 rounded-lg flex items-center justify-center mr-4">
                               {product.images && product.images.length > 0 ? (
-                                <img 
+                                <Image 
                                   src={product.images[0].url} 
                                   alt={product.name}
                                   className="w-12 h-12 object-cover rounded-lg"

@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 
 export default function TravelCollectionPage() {
   const [products, setProducts] = useState([]);
@@ -215,7 +216,7 @@ export default function TravelCollectionPage() {
                       <div className="relative">
                         <div className="h-64 bg-gray-200 rounded-t-lg overflow-hidden">
                           {product.images && product.images.length > 0 ? (
-                            <img
+                            <Image
                               src={product.images[0].url}
                               alt={product.name}
                               className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"

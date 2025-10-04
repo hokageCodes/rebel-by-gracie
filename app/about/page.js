@@ -35,14 +35,14 @@ export default function AboutPage() {
                 </p>
                 <p>
                   We carefully curate each piece in our collection, working with skilled artisans 
-                  who share our commitment to excellence. From the Women's Collection featuring 
+                  who share our commitment to excellence. From the Womens Collection featuring 
                   elegant RG Midi and Mini handbags to our sophisticated Men's Collection with 
                   professional briefcases and laptop bags, every item tells a story of quality and refinement.
                 </p>
                 <p>
                   Our Travel Collection ensures that your adventures are accompanied by durable, 
                   stylish luggage that makes a statement wherever you go. At RebelByGrace, we 
-                  believe that true luxury lies in the details – the perfect stitch, the finest 
+                  believe that true luxury lies in the details he perfect stitch, the finest 
                   materials, and the thoughtful design that anticipates your needs.
                 </p>
               </div>
@@ -177,7 +177,7 @@ export default function AboutPage() {
                   Men's Collection
                 </h3>
                 <p className="text-secondary-600 mb-4">
-                  Professional and stylish bags that complement the modern man's lifestyle 
+                  Professional and stylish bags that complement the modern mans lifestyle 
                   and career aspirations.
                 </p>
                 <ul className="text-sm text-secondary-500 space-y-1">

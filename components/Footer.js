@@ -52,12 +52,12 @@ export default function Footer() {
               </li>
               <li>
                 <Link href="/collections/womens" className="text-secondary-300 hover:text-primary-400 transition-colors">
-                  Women's Collection
+                  Womens Collection
                 </Link>
               </li>
               <li>
                 <Link href="/collections/mens" className="text-secondary-300 hover:text-primary-400 transition-colors">
-                  Men's Collection
+                  Mens Collection
                 </Link>
               </li>
               <li>

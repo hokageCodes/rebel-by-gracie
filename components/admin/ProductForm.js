@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import { useState, useEffect } from 'react';
 
 const categories = [
@@ -428,7 +429,7 @@ export default function ProductForm({ product, onCancel, onSubmit }) {
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               {images.map((image, index) => (
                 <div key={index} className="relative">
-                  <img
+                  <Image
                     src={image.url}
                     alt={image.alt}
                     className="w-full h-32 object-cover rounded-lg"

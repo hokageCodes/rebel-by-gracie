@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 
 export default function CollectionsPage() {
   const [collections, setCollections] = useState([]);
@@ -96,7 +97,7 @@ export default function CollectionsPage() {
             <div key={collection.id} className="bg-white rounded-2xl shadow-xl overflow-hidden">
               <div className="md:flex">
                 <div className="md:w-1/2">
-                  <img
+                  <Image
                     src={collection.image}
                     alt={collection.name}
                     className="w-full h-64 md:h-full object-cover"
@@ -116,7 +117,7 @@ export default function CollectionsPage() {
                           <div key={product._id} className="text-center">
                             <div className="w-full h-24 bg-gray-200 rounded-lg mb-2 overflow-hidden">
                               {product.images && product.images.length > 0 ? (
-                                <img
+                                <Image
                                   src={product.images[0].url}
                                   alt={product.name}
                                   className="w-full h-full object-cover"

@@ -120,7 +120,7 @@ export default function ContentManagement() {
               </label>
               <div className="bg-gray-50 rounded-lg p-4">
                 <p className="text-sm text-gray-600 mb-2">Featured products will be automatically selected based on your "Featured" product settings.</p>
-                <p className="text-xs text-gray-500">Products marked as "Featured" in the Products section will appear here.</p>
+                <p className="text-xs text-gray-500">Products marked as Featured in the Products section will appear here.</p>
               </div>
             </div>
           </div>
