@@ -1,10 +1,10 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 
-export default function VerifyOtpPage() {
+function VerifyOtpInner() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [verificationCode, setVerificationCode] = useState('');
@@ -39,27 +39,21 @@ export default function VerifyOtpPage() {
     try {
       const response = await fetch('/api/auth/verify', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          email,
-          verificationCode,
-        }),
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, verificationCode }),
       });
 
       const data = await response.json();
 
       if (response.ok) {
         setSuccess(true);
-        // Redirect to login after successful verification
         setTimeout(() => {
           router.push('/login');
         }, 2000);
       } else {
         setError(data.error || 'Verification failed');
       }
-    } catch (error) {
+    } catch {
       setError('Network error. Please try again.');
     } finally {
       setLoading(false);
@@ -78,9 +72,7 @@ export default function VerifyOtpPage() {
     try {
       const response = await fetch('/api/auth/resend-verification', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email }),
       });
 
@@ -92,7 +84,7 @@ export default function VerifyOtpPage() {
       } else {
         setError(data.error || 'Failed to resend verification code');
       }
-    } catch (error) {
+    } catch {
       setError('Network error. Please try again.');
     } finally {
       setResendingCode(false);
@@ -100,7 +92,7 @@ export default function VerifyOtpPage() {
   };
 
   const handleCodeChange = (e) => {
-    const value = e.target.value.replace(/\D/g, ''); // Only numbers
+    const value = e.target.value.replace(/\D/g, ''); // only numbers
     setVerificationCode(value);
     setError('');
   };
@@ -160,7 +152,7 @@ export default function VerifyOtpPage() {
               id="verificationCode"
               name="verificationCode"
               type="text"
-              maxLength="6"
+              maxLength={6}
               required
               className={`relative block w-full px-3 py-4 border ${
                 error ? 'border-red-300' : 'border-gray-300'
@@ -187,7 +179,7 @@ export default function VerifyOtpPage() {
 
           <div className="text-center">
             <p className="text-sm text-gray-600">
-              Didnt receive the code?{' '}
+              Didn&apos;t receive the code?{' '}
               <button
                 type="button"
                 onClick={handleResendCode}
@@ -210,5 +202,13 @@ export default function VerifyOtpPage() {
         </form>
       </div>
     </div>
+  );
+}
+
+export default function VerifyOtpPage() {
+  return (
+    <Suspense fallback={<div className="p-10 text-center">Loading...</div>}>
+      <VerifyOtpInner />
+    </Suspense>
   );
 }
