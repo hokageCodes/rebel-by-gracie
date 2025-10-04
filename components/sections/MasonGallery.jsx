@@ -3,12 +3,12 @@ import React, { useState, useRef, useEffect } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 const galleryImages = [
-  { id: 1, src: '/bags/1.jpeg', alt: 'Client Campaign 1' },
-  { id: 2, src: '/bags/2.jpeg', alt: 'Model Showcase 2' },
-  { id: 3, src: '/bags/3.jpeg', alt: 'Product Advert 3' },
-  { id: 4, src: '/bags/4.jpeg', alt: 'Client Campaign 4' },
-  { id: 5, src: '/bags/5.jpeg', alt: 'Behind the Scenes 5' },
-  { id: 6, src: '/bags/6.jpeg', alt: 'Advert Shoot 6' },
+  { id: 1, src: '/gallery/1.jpeg', alt: 'Client Campaign 1' },
+  { id: 2, src: '/gallery/2.jpeg', alt: 'Model Showcase 2' },
+  { id: 3, src: '/gallery/3.jpeg', alt: 'Product Advert 3' },
+  { id: 4, src: '/gallery/4.jpeg', alt: 'Client Campaign 4' },
+  { id: 5, src: '/gallery/5.jpeg', alt: 'Behind the Scenes 5' },
+  { id: 6, src: '/gallery/6.jpeg', alt: 'Advert Shoot 6' },
 ];
 
 // Lazy Image component
