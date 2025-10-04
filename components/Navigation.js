@@ -121,6 +121,8 @@ export default function Navigation() {
                       src="/rg-logonobg.png" 
                       alt="RebelByGrace Logo" 
                       className="h-48 w-48 object-contain"
+                      width={192}
+                      height={192}
                     />
                 </Link>
               </div>
@@ -222,6 +224,8 @@ export default function Navigation() {
                 src="/rg-logonobg.png" 
                 alt="RebelByGrace" 
                 className="h-24 w-auto object-contain"
+                width={96}
+                height={96}
               />
             </Link>
             
