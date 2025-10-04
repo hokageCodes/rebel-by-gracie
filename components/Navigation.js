@@ -62,7 +62,7 @@ export default function Navigation() {
   ];
 
   return (
-    <nav className="bg-white shadow-sm border-b border-secondary-200 sticky top-0 z-50">
+    <nav className="bg-white shadow-sm border-b border-secondary-200 sticky top-0 z-50 md:h-28">
       {/* Desktop Layout with Center Logo */}
       <div className="hidden lg:block">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -71,7 +71,7 @@ export default function Navigation() {
             <div className="flex justify-between items-center h-16">
               
               {/* Left Navigation */}
-              <div className="flex items-center space-x-8 flex-1">
+              <div className="flex items-center space-x-8 pt-12 flex-1">
                 <Link href="/" className="text-secondary-700 hover:text-primary-600 transition-colors text-sm font-medium">
                   Home
                 </Link>
@@ -114,7 +114,7 @@ export default function Navigation() {
               </div>
 
               {/* Center Logo - Absolutely positioned, drops below nav */}
-              <div className="absolute left-1/2 -translate-x-1/2 top-0 -mt-12">
+              <div className="absolute left-1/2 -translate-x-1/2 top-0 -mt-10">
                 <Link href="/" className="block">
                     <img 
                       src="/rg-logonobg.png" 
@@ -125,7 +125,7 @@ export default function Navigation() {
               </div>
 
               {/* Right Navigation */}
-              <div className="flex items-center space-x-8 flex-1 justify-end">
+              <div className="flex items-center space-x-8 pt-12 flex-1 justify-end">
                 <Link href="/contact" className="text-secondary-700 hover:text-primary-600 transition-colors text-sm font-medium">
                   Contact
                 </Link>
