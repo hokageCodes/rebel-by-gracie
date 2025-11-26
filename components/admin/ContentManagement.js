@@ -34,7 +34,7 @@ export default function ContentManagement() {
         }
         setContent(contentObj);
       } else {
-        // If no content exists yet, that's expected - don't show error
+        // If no content exists yet, that&apos;s expected - don&apos;t show error
         if (response.status === 404) {
           console.log('No content found - will use default values');
         } else {

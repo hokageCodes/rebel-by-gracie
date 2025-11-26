@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { toast } from 'react-toastify';
 
 export default function UsersManagement() {
@@ -20,7 +20,7 @@ export default function UsersManagement() {
     totalItems: 0,
   });
 
-  const fetchUsers = async () => {
+  const fetchUsers = useCallback(async () => {
     try {
       setLoading(true);
       const params = new URLSearchParams({
@@ -51,11 +51,11 @@ export default function UsersManagement() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [pagination.currentPage, searchTerm, filters.role, filters.isActive, filters.isEmailVerified]);
 
   useEffect(() => {
     fetchUsers();
-  }, [pagination.currentPage]);
+  }, [pagination.currentPage, fetchUsers]);
 
   // Reactive filtering with debouncing
   useEffect(() => {
@@ -65,12 +65,12 @@ export default function UsersManagement() {
     }, 300); // Debounce for 300ms
 
     return () => clearTimeout(timeoutId);
-  }, [searchTerm]);
+  }, [searchTerm, fetchUsers]);
 
   useEffect(() => {
     setPagination(prev => ({ ...prev, currentPage: 1 }));
     fetchUsers();
-  }, [filters.role, filters.isActive, filters.isEmailVerified]);
+  }, [filters.role, filters.isActive, filters.isEmailVerified, fetchUsers]);
 
   const clearFilters = () => {
     setSearchTerm('');
