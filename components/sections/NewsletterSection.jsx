@@ -12,7 +12,7 @@ export default function NewsletterSection() {
   };
 
   return (
-    <section className="py-20 px-6 lg:px-16 text-luxury-cream relative overflow-hidden">
+    <section className="py-20 pt-24 md:pt-32 px-6 lg:px-16 text-luxury-cream relative overflow-hidden">
       {/* Background Accent */}
       {/* <div className="absolute inset-0 bg-gradient-to-br from-luxury-black via-luxury-graphite to-luxury-charcoal opacity-90"></div> */}
 

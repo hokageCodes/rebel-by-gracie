@@ -16,23 +16,42 @@ export default function Navigation() {
     fetchCartCount();
   }, [user]);
 
+  // Listen for real-time auth state changes
+  useEffect(() => {
+    const handleAuthChange = () => {
+      // Force re-render when auth state changes
+      // The user state from context will automatically update
+    };
+
+    window.addEventListener('auth-state-changed', handleAuthChange);
+    return () => {
+      window.removeEventListener('auth-state-changed', handleAuthChange);
+    };
+  }, []);
+
+  // Listen for cart updates
+  useEffect(() => {
+    const handleCartUpdate = () => {
+      fetchCartCount();
+    };
+
+    window.addEventListener('cart-updated', handleCartUpdate);
+    window.addEventListener('auth-state-changed', handleCartUpdate);
+
+    return () => {
+      window.removeEventListener('cart-updated', handleCartUpdate);
+      window.removeEventListener('auth-state-changed', handleCartUpdate);
+    };
+  }, []);
+
   const fetchCartCount = async () => {
     try {
-      const sessionId = localStorage.getItem('sessionId') || generateSessionId();
-      const response = await fetch(`/api/cart?sessionId=${sessionId}`);
-      if (response.ok) {
-        const data = await response.json();
-        setCartCount(data.cart?.totalItems || 0);
-      }
+      const { getCartCount } = await import('@/lib/utils/cart');
+      const count = await getCartCount();
+      setCartCount(count);
     } catch (error) {
       console.error('Error fetching cart count:', error);
     }
-  };
-
-  const generateSessionId = () => {
-    const sessionId = Math.random().toString(36).substring(2, 15);
-    localStorage.setItem('sessionId', sessionId);
-    return sessionId;
   };
 
   const handleLogout = async () => {
@@ -47,23 +66,23 @@ export default function Navigation() {
 
   const collections = [
     { name: "Women's Collection", href: "/collections/womens", categories: [
-      { name: "RG Midi Handbag", href: "/collections/womens/rg-midi-handbag" },
-      { name: "RG Mini Handbag", href: "/collections/womens/rg-mini-handbag" },
-      { name: "Celia Clutch Purse", href: "/collections/womens/celia-clutch-purse" },
-      { name: "The Livvy Bag", href: "/collections/womens/the-livvy-bag" },
-      { name: "RG Box Mini", href: "/collections/womens/rg-box-mini" },
+      { name: "RG Midi Handbag", category: "rg-midi-handbag", collection: "womens" },
+      { name: "RG Mini Handbag", category: "rg-mini-handbag", collection: "womens" },
+      { name: "Celia Clutch Purse", category: "celia-clutch-purse", collection: "womens" },
+      { name: "The Livvy Bag", category: "the-livvy-bag", collection: "womens" },
+      { name: "RG Box Mini", category: "rg-box-mini", collection: "womens" },
     ]},
     { name: "Men's Collection", href: "/collections/mens", categories: [
-      { name: "Bull Briefcase", href: "/collections/mens/bull-briefcase" },
-      { name: "Classic Laptop Bag", href: "/collections/mens/classic-laptop-bag" },
+      { name: "Bull Briefcase", category: "bull-briefcase", collection: "mens" },
+      { name: "Classic Laptop Bag", category: "classic-laptop-bag", collection: "mens" },
     ]},
     { name: "Travel Collection", href: "/collections/travel", categories: [
-      { name: "RG Luxe Duffel Bag", href: "/collections/travel/rg-luxe-duffel-bag" },
+      { name: "RG Luxe Duffel Bag", category: "rg-luxe-duffel-bag", collection: "travel" },
     ]},
   ];
 
   return (
-    <nav className="bg-white shadow-sm border-b border-secondary-200 sticky top-0 z-50 md:h-28">
+    <nav className="bg-white shadow-sm border-b border-secondary-200 fixed top-0 left-0 right-0 z-50 md:h-28">
       {/* Desktop Layout with Center Logo */}
       <div className="hidden lg:block">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -73,15 +92,19 @@ export default function Navigation() {
               
               {/* Left Navigation */}
               <div className="flex items-center space-x-8 pt-12 flex-1">
-                <Link href="/" className="text-secondary-700 hover:text-primary-600 transition-colors text-sm font-medium">
+                <Link href="/" className="text-secondary-700 hover:text-primary-600 transition-colors text-base font-medium">
                   Home
+                </Link>
+                
+                <Link href="/shop" className="text-secondary-700 hover:text-primary-600 transition-colors text-base font-medium">
+                  Shop
                 </Link>
                 
                 {/* Collections Dropdown */}
                 <div className="relative group">
-                  <button className="text-secondary-700 hover:text-primary-600 transition-colors flex items-center space-x-1 text-sm font-medium">
+                  <button className="text-secondary-700 hover:text-primary-600 transition-colors flex items-center space-x-1 text-base font-medium">
                     <span>Collections</span>
-                    <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                     </svg>
                   </button>
@@ -91,15 +114,15 @@ export default function Navigation() {
                       <div key={collection.name} className="p-2">
                         <Link 
                           href={collection.href}
-                          className="block px-3 py-2 text-sm font-medium text-secondary-800 hover:text-primary-600 hover:bg-secondary-50 rounded"
+                          className="block px-3 py-2 text-base font-medium text-secondary-800 hover:text-primary-600 hover:bg-secondary-50 rounded"
                         >
                           {collection.name}
                         </Link>
                         {collection.categories.map((category) => (
                           <Link
                             key={category.name}
-                            href={category.href}
-                            className="block px-6 py-1.5 text-xs text-secondary-600 hover:text-primary-600 hover:bg-secondary-50 rounded"
+                            href={`/collections/${category.collection}?category=${category.category}`}
+                            className="block px-6 py-1.5 text-sm text-secondary-600 hover:text-primary-600 hover:bg-secondary-50 rounded"
                           >
                             {category.name}
                           </Link>
@@ -109,7 +132,7 @@ export default function Navigation() {
                   </div>
                 </div>
 
-                <Link href="/about" className="text-secondary-700 hover:text-primary-600 transition-colors text-sm font-medium">
+                <Link href="/about" className="text-secondary-700 hover:text-primary-600 transition-colors text-base font-medium">
                   About
                 </Link>
               </div>
@@ -129,7 +152,7 @@ export default function Navigation() {
 
               {/* Right Navigation */}
               <div className="flex items-center space-x-8 pt-12 flex-1 justify-end">
-                <Link href="/contact" className="text-secondary-700 hover:text-primary-600 transition-colors text-sm font-medium">
+                <Link href="/contact" className="text-secondary-700 hover:text-primary-600 transition-colors text-base font-medium">
                   Contact
                 </Link>
 
@@ -162,18 +185,22 @@ export default function Navigation() {
                         <p className="text-xs text-secondary-500 truncate mt-0.5">{user.email}</p>
                       </div>
                       <div className="py-1">
-                        <Link href="/account" className="flex items-center px-4 py-2.5 text-sm text-secondary-700 hover:text-primary-600 hover:bg-secondary-50 transition-colors">
-                          <svg className="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                          </svg>
-                          My Account
-                        </Link>
-                        <Link href="/orders" className="flex items-center px-4 py-2.5 text-sm text-secondary-700 hover:text-primary-600 hover:bg-secondary-50 transition-colors">
-                          <svg className="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
-                          </svg>
-                          My Orders
-                        </Link>
+                        {!isAdmin && (
+                          <Link href="/account" className="flex items-center px-4 py-2.5 text-sm text-secondary-700 hover:text-primary-600 hover:bg-secondary-50 transition-colors">
+                            <svg className="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                            </svg>
+                            My Account
+                          </Link>
+                        )}
+                        {!isAdmin && (
+                          <Link href="/orders" className="flex items-center px-4 py-2.5 text-sm text-secondary-700 hover:text-primary-600 hover:bg-secondary-50 transition-colors">
+                            <svg className="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+                            </svg>
+                            My Orders
+                          </Link>
+                        )}
                         {isAdmin && (
                           <Link href="/admin" className="flex items-center px-4 py-2.5 text-sm text-secondary-700 hover:text-primary-600 hover:bg-secondary-50 transition-colors border-t border-secondary-200">
                             <svg className="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -197,10 +224,10 @@ export default function Navigation() {
                   </div>
                 ) : (
                   <div className="flex items-center space-x-3">
-                    <Link href="/login" className="text-secondary-700 hover:text-primary-600 transition-colors px-4 py-2 text-sm font-medium rounded-md hover:bg-secondary-50">
+                    <Link href="/auth/login" className="text-secondary-700 hover:text-primary-600 transition-colors px-4 py-2 text-base font-medium rounded-md hover:bg-secondary-50">
                       Login
                     </Link>
-                    <Link href="/register" className="bg-primary-600 text-white px-5 py-2 rounded-full text-sm font-medium hover:bg-primary-700 transition-all shadow-md hover:shadow-lg">
+                    <Link href="/auth/register" className="bg-primary-600 text-white px-5 py-2 rounded-full text-base font-medium hover:bg-primary-700 transition-all shadow-md hover:shadow-lg">
                       Sign Up
                     </Link>
                   </div>
@@ -262,22 +289,25 @@ export default function Navigation() {
           {isMenuOpen && (
             <div className="border-t border-secondary-200 py-4">
               <div className="space-y-1">
-                <Link href="/" className="block px-3 py-2 text-secondary-700 hover:text-primary-600 hover:bg-secondary-50 rounded-md transition-colors">
+                <Link href="/" className="block px-3 py-2 text-base text-secondary-700 hover:text-primary-600 hover:bg-secondary-50 rounded-md transition-colors">
                   Home
                 </Link>
-                <Link href="/collections/womens" className="block px-3 py-2 text-secondary-700 hover:text-primary-600 hover:bg-secondary-50 rounded-md transition-colors">
+                <Link href="/shop" className="block px-3 py-2 text-base text-secondary-700 hover:text-primary-600 hover:bg-secondary-50 rounded-md transition-colors">
+                  Shop
+                </Link>
+                <Link href="/collections/womens" className="block px-3 py-2 text-base text-secondary-700 hover:text-primary-600 hover:bg-secondary-50 rounded-md transition-colors">
                   Womens Collection
                 </Link>
-                <Link href="/collections/mens" className="block px-3 py-2 text-secondary-700 hover:text-primary-600 hover:bg-secondary-50 rounded-md transition-colors">
+                <Link href="/collections/mens" className="block px-3 py-2 text-base text-secondary-700 hover:text-primary-600 hover:bg-secondary-50 rounded-md transition-colors">
                   Mens Collection
                 </Link>
-                <Link href="/collections/travel" className="block px-3 py-2 text-secondary-700 hover:text-primary-600 hover:bg-secondary-50 rounded-md transition-colors">
+                <Link href="/collections/travel" className="block px-3 py-2 text-base text-secondary-700 hover:text-primary-600 hover:bg-secondary-50 rounded-md transition-colors">
                   Travel Collection
                 </Link>
-                <Link href="/about" className="block px-3 py-2 text-secondary-700 hover:text-primary-600 hover:bg-secondary-50 rounded-md transition-colors">
+                <Link href="/about" className="block px-3 py-2 text-base text-secondary-700 hover:text-primary-600 hover:bg-secondary-50 rounded-md transition-colors">
                   About
                 </Link>
-                <Link href="/contact" className="block px-3 py-2 text-secondary-700 hover:text-primary-600 hover:bg-secondary-50 rounded-md transition-colors">
+                <Link href="/contact" className="block px-3 py-2 text-base text-secondary-700 hover:text-primary-600 hover:bg-secondary-50 rounded-md transition-colors">
                   Contact
                 </Link>
 
@@ -290,30 +320,34 @@ export default function Navigation() {
                       </div>
                       <span>{user.firstName} {user.lastName}</span>
                     </div>
-                    <Link href="/account" className="block px-3 py-2 text-secondary-700 hover:text-primary-600 hover:bg-secondary-50 rounded-md transition-colors">
-                      My Account
-                    </Link>
-                    <Link href="/orders" className="block px-3 py-2 text-secondary-700 hover:text-primary-600 hover:bg-secondary-50 rounded-md transition-colors">
-                      My Orders
-                    </Link>
+                    {!isAdmin && (
+                      <Link href="/account" className="block px-3 py-2 text-base text-secondary-700 hover:text-primary-600 hover:bg-secondary-50 rounded-md transition-colors">
+                        My Account
+                      </Link>
+                    )}
+                    {!isAdmin && (
+                      <Link href="/orders" className="block px-3 py-2 text-base text-secondary-700 hover:text-primary-600 hover:bg-secondary-50 rounded-md transition-colors">
+                        My Orders
+                      </Link>
+                    )}
                     {isAdmin && (
-                      <Link href="/admin" className="block px-3 py-2 text-secondary-700 hover:text-primary-600 hover:bg-secondary-50 rounded-md transition-colors">
+                      <Link href="/admin" className="block px-3 py-2 text-base text-secondary-700 hover:text-primary-600 hover:bg-secondary-50 rounded-md transition-colors">
                         Admin Dashboard
                       </Link>
                     )}
                     <button 
                       onClick={handleLogout}
-                      className="block w-full text-left px-3 py-2 text-red-600 hover:text-red-700 hover:bg-red-50 rounded-md transition-colors"
+                      className="block w-full text-left px-3 py-2 text-base text-red-600 hover:text-red-700 hover:bg-red-50 rounded-md transition-colors"
                     >
                       Logout
                     </button>
                   </div>
                 ) : (
                   <div className="border-t border-secondary-200 pt-4 mt-4 space-y-2">
-                    <Link href="/login" className="block px-3 py-2 text-secondary-700 hover:text-primary-600 hover:bg-secondary-50 rounded-md transition-colors">
+                    <Link href="/auth/login" className="block px-3 py-2 text-base text-secondary-700 hover:text-primary-600 hover:bg-secondary-50 rounded-md transition-colors">
                       Login
                     </Link>
-                    <Link href="/register" className="block px-3 py-2 text-white bg-primary-600 hover:bg-primary-700 rounded-md text-center font-medium transition-colors">
+                    <Link href="/auth/register" className="block px-3 py-2 text-base text-white bg-primary-600 hover:bg-primary-700 rounded-md text-center font-medium transition-colors">
                       Sign Up
                     </Link>
                   </div>

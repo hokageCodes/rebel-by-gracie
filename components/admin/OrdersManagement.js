@@ -2,6 +2,7 @@
 
 import Image from 'next/image';
 import { useState, useEffect } from 'react';
+import { toast } from 'react-toastify';
 
 export default function OrdersManagement() {
   const [orders, setOrders] = useState([]);
@@ -13,26 +14,53 @@ export default function OrdersManagement() {
     paymentStatus: '',
     search: '',
   });
+  const [searchTerm, setSearchTerm] = useState('');
+  const [selectedOrders, setSelectedOrders] = useState([]);
   const [pagination, setPagination] = useState({
     currentPage: 1,
     totalPages: 1,
     totalItems: 0,
   });
+  const [orderStats, setOrderStats] = useState({
+    pending: 0,
+    confirmed: 0,
+    processing: 0,
+    shipped: 0,
+    delivered: 0,
+    cancelled: 0,
+  });
 
   useEffect(() => {
     fetchOrders();
-  }, [pagination.currentPage, filters]);
+  }, [pagination.currentPage]);
+
+  // Reactive filtering with debouncing
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      setPagination(prev => ({ ...prev, currentPage: 1 }));
+      setFilters(prev => ({ ...prev, search: searchTerm }));
+      fetchOrders();
+    }, 300); // Debounce for 300ms
+
+    return () => clearTimeout(timeoutId);
+  }, [searchTerm]);
+
+  useEffect(() => {
+    setPagination(prev => ({ ...prev, currentPage: 1 }));
+    fetchOrders();
+  }, [filters.status, filters.paymentStatus]);
 
   const fetchOrders = async () => {
     try {
       setLoading(true);
       const params = new URLSearchParams({
-        page: pagination.currentPage.toString(),
+        page: (pagination?.currentPage || 1).toString(),
         limit: '20',
-        ...(filters.status && { status: filters.status }),
-        ...(filters.paymentStatus && { paymentStatus: filters.paymentStatus }),
-        ...(filters.search && { search: filters.search }),
       });
+      
+      if (searchTerm) params.append('search', searchTerm);
+      if (filters.status) params.append('status', filters.status);
+      if (filters.paymentStatus) params.append('paymentStatus', filters.paymentStatus);
       
       const response = await fetch(`/api/admin/orders?${params}`);
       const data = await response.json();
@@ -41,14 +69,15 @@ export default function OrdersManagement() {
       setPagination(data.pagination || pagination);
     } catch (error) {
       console.error('Error fetching orders:', error);
+      toast.error('Failed to fetch orders');
     } finally {
       setLoading(false);
     }
   };
 
-  const handleOrderStatusUpdate = async (orderId, newStatus) => {
+  const handleOrderStatusUpdate = async (orderNumber, newStatus) => {
     try {
-      const response = await fetch(`/api/admin/orders/${orderId}`, {
+      const response = await fetch(`/api/admin/orders/${orderNumber}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -58,21 +87,103 @@ export default function OrdersManagement() {
 
       if (response.ok) {
         fetchOrders(); // Refresh the list
-        if (selectedOrder && selectedOrder._id === orderId) {
+        if (selectedOrder && selectedOrder.orderNumber === orderNumber) {
           setSelectedOrder(prev => ({ ...prev, orderStatus: newStatus }));
         }
+        toast.success(`Order status updated to ${newStatus}`);
       } else {
-        alert('Failed to update order status');
+        const errorData = await response.json();
+        toast.error(`Failed to update order status: ${errorData.error || 'Unknown error'}`);
       }
     } catch (error) {
       console.error('Error updating order status:', error);
-      alert('Error updating order status');
+      toast.error('Error updating order status');
+    }
+  };
+
+  const handlePaymentStatusUpdate = async (orderNumber, newStatus) => {
+    try {
+      const response = await fetch(`/api/admin/orders/${orderNumber}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ paymentStatus: newStatus }),
+      });
+
+      if (response.ok) {
+        fetchOrders(); // Refresh the list
+        if (selectedOrder && selectedOrder.orderNumber === orderNumber) {
+          setSelectedOrder(prev => ({ ...prev, paymentStatus: newStatus }));
+        }
+        toast.success(`Payment status updated to ${newStatus}`);
+      } else {
+        const errorData = await response.json();
+        toast.error(`Failed to update payment status: ${errorData.error || 'Unknown error'}`);
+      }
+    } catch (error) {
+      console.error('Error updating payment status:', error);
+      toast.error('Error updating payment status');
     }
   };
 
   const handleViewOrder = (order) => {
     setSelectedOrder(order);
     setShowOrderDetails(true);
+  };
+
+  const handleSelectAll = () => {
+    if (selectedOrders.length === orders.length) {
+      setSelectedOrders([]);
+    } else {
+      setSelectedOrders(orders.map(order => order._id));
+    }
+  };
+
+  const handleSelectOrder = (orderId) => {
+    setSelectedOrders(prev =>
+      prev.includes(orderId)
+        ? prev.filter(id => id !== orderId)
+        : [...prev, orderId]
+    );
+  };
+
+  const handleBulkStatusUpdate = async (newStatus) => {
+    if (selectedOrders.length === 0) return;
+
+    try {
+      const selectedOrderNumbers = selectedOrders.map(orderId => 
+        orders.find(order => order._id === orderId)?.orderNumber
+      ).filter(Boolean);
+
+      const updatePromises = selectedOrderNumbers.map(orderNumber =>
+        fetch(`/api/admin/orders/${orderNumber}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ orderStatus: newStatus }),
+        })
+      );
+      
+      await Promise.all(updatePromises);
+      setSelectedOrders([]);
+      fetchOrders();
+      toast.success(`${selectedOrders.length} orders updated to ${newStatus}`);
+    } catch (error) {
+      console.error('Bulk update error:', error);
+      toast.error('Error updating orders');
+    }
+  };
+
+  const clearFilters = () => {
+    setSearchTerm('');
+    setFilters({
+      status: '',
+      paymentStatus: '',
+      search: '',
+    });
+    setPagination(prev => ({ ...prev, currentPage: 1 }));
+    fetchOrders();
+    toast.info('Filters cleared');
   };
 
   const formatCurrency = (amount) => {
@@ -123,6 +234,34 @@ export default function OrdersManagement() {
         <p className="text-gray-600 mt-2">Manage customer orders and track their status</p>
       </div>
 
+      {/* Order Statistics */}
+      <div className="grid grid-cols-2 md:grid-cols-6 gap-4">
+        <div className="bg-white rounded-lg shadow p-4">
+          <div className="text-2xl font-bold text-yellow-600">{orderStats.pending}</div>
+          <div className="text-sm text-gray-600">Pending</div>
+        </div>
+        <div className="bg-white rounded-lg shadow p-4">
+          <div className="text-2xl font-bold text-blue-600">{orderStats.confirmed}</div>
+          <div className="text-sm text-gray-600">Confirmed</div>
+        </div>
+        <div className="bg-white rounded-lg shadow p-4">
+          <div className="text-2xl font-bold text-purple-600">{orderStats.processing}</div>
+          <div className="text-sm text-gray-600">Processing</div>
+        </div>
+        <div className="bg-white rounded-lg shadow p-4">
+          <div className="text-2xl font-bold text-indigo-600">{orderStats.shipped}</div>
+          <div className="text-sm text-gray-600">Shipped</div>
+        </div>
+        <div className="bg-white rounded-lg shadow p-4">
+          <div className="text-2xl font-bold text-green-600">{orderStats.delivered}</div>
+          <div className="text-sm text-gray-600">Delivered</div>
+        </div>
+        <div className="bg-white rounded-lg shadow p-4">
+          <div className="text-2xl font-bold text-red-600">{orderStats.cancelled}</div>
+          <div className="text-sm text-gray-600">Cancelled</div>
+        </div>
+      </div>
+
       {/* Filters */}
       <div className="bg-white rounded-lg shadow p-6">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
@@ -130,13 +269,20 @@ export default function OrdersManagement() {
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Search Orders
             </label>
-            <input
-              type="text"
-              placeholder="Order number, customer name, or email"
-              value={filters.search}
-              onChange={(e) => setFilters(prev => ({ ...prev, search: e.target.value }))}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-            />
+            <div className="relative">
+              <input
+                type="text"
+                placeholder="Order number, customer name, or email"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+              />
+              {loading && (
+                <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary-600"></div>
+                </div>
+              )}
+            </div>
           </div>
 
           <div>
@@ -177,14 +323,62 @@ export default function OrdersManagement() {
 
           <div className="flex items-end">
             <button
-              onClick={fetchOrders}
-              className="w-full bg-primary-600 text-white px-4 py-2 rounded-lg hover:bg-primary-700 transition-colors"
+              onClick={clearFilters}
+              className="w-full bg-gray-100 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-200 transition-colors flex items-center justify-center space-x-2"
             >
-              Apply Filters
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+              <span>Clear Filters</span>
             </button>
           </div>
         </div>
       </div>
+
+      {/* Bulk Actions */}
+      {selectedOrders.length > 0 && (
+        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+          <div className="flex flex-col sm:flex-row items-center justify-between space-y-3 sm:space-y-0">
+            <div className="flex items-center space-x-2">
+              <span className="text-sm font-medium text-blue-900">
+                {selectedOrders.length} order{selectedOrders.length !== 1 ? 's' : ''} selected
+              </span>
+            </div>
+            <div className="flex flex-wrap items-center space-x-2">
+              <button
+                onClick={() => handleBulkStatusUpdate('confirmed')}
+                className="px-3 py-1 bg-blue-600 text-white text-sm rounded-md hover:bg-blue-700 transition-colors"
+              >
+                Confirm
+              </button>
+              <button
+                onClick={() => handleBulkStatusUpdate('processing')}
+                className="px-3 py-1 bg-purple-600 text-white text-sm rounded-md hover:bg-purple-700 transition-colors"
+              >
+                Processing
+              </button>
+              <button
+                onClick={() => handleBulkStatusUpdate('shipped')}
+                className="px-3 py-1 bg-indigo-600 text-white text-sm rounded-md hover:bg-indigo-700 transition-colors"
+              >
+                Ship
+              </button>
+              <button
+                onClick={() => handleBulkStatusUpdate('delivered')}
+                className="px-3 py-1 bg-green-600 text-white text-sm rounded-md hover:bg-green-700 transition-colors"
+              >
+                Deliver
+              </button>
+              <button
+                onClick={() => setSelectedOrders([])}
+                className="px-3 py-1 bg-gray-600 text-white text-sm rounded-md hover:bg-gray-700 transition-colors"
+              >
+                Clear Selection
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Orders Table */}
       <div className="bg-white rounded-lg shadow">
@@ -212,6 +406,14 @@ export default function OrdersManagement() {
                 <table className="min-w-full divide-y divide-gray-200">
                   <thead className="bg-gray-50">
                     <tr>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        <input
+                          type="checkbox"
+                          checked={selectedOrders.length === orders.length && orders.length > 0}
+                          onChange={handleSelectAll}
+                          className="rounded border-gray-300"
+                        />
+                      </th>
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                         Order
                       </th>
@@ -241,6 +443,14 @@ export default function OrdersManagement() {
                   <tbody className="bg-white divide-y divide-gray-200">
                     {orders.map((order) => (
                       <tr key={order._id}>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <input
+                            type="checkbox"
+                            checked={selectedOrders.includes(order._id)}
+                            onChange={() => handleSelectOrder(order._id)}
+                            className="rounded border-gray-300"
+                          />
+                        </td>
                         <td className="px-6 py-4 whitespace-nowrap">
                           <div className="text-sm font-medium text-gray-900">{order.orderNumber}</div>
                         </td>
@@ -335,13 +545,14 @@ export default function OrdersManagement() {
             setSelectedOrder(null);
           }}
           onStatusUpdate={handleOrderStatusUpdate}
+          onPaymentStatusUpdate={handlePaymentStatusUpdate}
         />
       )}
     </div>
   );
 }
 
-function OrderDetailsModal({ order, onClose, onStatusUpdate }) {
+function OrderDetailsModal({ order, onClose, onStatusUpdate, onPaymentStatusUpdate }) {
   const formatCurrency = (amount) => {
     return new Intl.NumberFormat('en-NG', {
       style: 'currency',
@@ -411,14 +622,36 @@ function OrderDetailsModal({ order, onClose, onStatusUpdate }) {
             </div>
 
             <div className="bg-gray-50 rounded-lg p-4">
-              <h3 className="text-sm font-medium text-gray-700 mb-2">Order Status</h3>
-              <div className="space-y-2">
-                <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(order.orderStatus)}`}>
-                  {order.orderStatus}
-                </span>
-                <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getPaymentStatusColor(order.paymentStatus)}`}>
-                  {order.paymentStatus}
-                </span>
+              <h3 className="text-sm font-medium text-gray-700 mb-3">Order Status</h3>
+              <div className="space-y-3">
+                <div>
+                  <label className="block text-xs font-medium text-gray-600 mb-1">Order Status</label>
+                  <select
+                    value={order.orderStatus}
+                    onChange={(e) => onStatusUpdate(order.orderNumber, e.target.value)}
+                    className="w-full px-2 py-1 text-xs border border-gray-300 rounded focus:ring-1 focus:ring-primary-500 focus:border-primary-500"
+                  >
+                    <option value="pending">Pending</option>
+                    <option value="confirmed">Confirmed</option>
+                    <option value="processing">Processing</option>
+                    <option value="shipped">Shipped</option>
+                    <option value="delivered">Delivered</option>
+                    <option value="cancelled">Cancelled</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-gray-600 mb-1">Payment Status</label>
+                  <select
+                    value={order.paymentStatus}
+                    onChange={(e) => onPaymentStatusUpdate(order.orderNumber, e.target.value)}
+                    className="w-full px-2 py-1 text-xs border border-gray-300 rounded focus:ring-1 focus:ring-primary-500 focus:border-primary-500"
+                  >
+                    <option value="pending">Pending</option>
+                    <option value="paid">Paid</option>
+                    <option value="failed">Failed</option>
+                    <option value="refunded">Refunded</option>
+                  </select>
+                </div>
               </div>
             </div>
 
@@ -474,7 +707,7 @@ function OrderDetailsModal({ order, onClose, onStatusUpdate }) {
                 <div key={index} className="flex items-center space-x-4 bg-gray-50 rounded-lg p-4">
                   <div className="w-16 h-16 bg-gray-200 rounded-lg flex items-center justify-center">
                     {item.image ? (
-                      <Image src={item.image} alt={item.name} className="w-16 h-16 object-cover rounded-lg" />
+                      <Image src={item.image} alt={item.name} width={64} height={64} className="w-16 h-16 object-cover rounded-lg" />
                     ) : (
                       <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
@@ -531,25 +764,13 @@ function OrderDetailsModal({ order, onClose, onStatusUpdate }) {
           )}
         </div>
 
-        <div className="px-6 py-4 border-t border-gray-200 flex items-center justify-end space-x-4">
+        <div className="px-6 py-4 border-t border-gray-200 flex items-center justify-end">
           <button
             onClick={onClose}
-            className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors"
+            className="px-6 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
           >
             Close
           </button>
-          <select
-            value={order.orderStatus}
-            onChange={(e) => onStatusUpdate(order._id, e.target.value)}
-            className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-          >
-            <option value="pending">Pending</option>
-            <option value="confirmed">Confirmed</option>
-            <option value="processing">Processing</option>
-            <option value="shipped">Shipped</option>
-            <option value="delivered">Delivered</option>
-            <option value="cancelled">Cancelled</option>
-          </select>
         </div>
       </div>
     </div>

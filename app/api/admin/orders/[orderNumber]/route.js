@@ -6,7 +6,7 @@ async function handler(request, { params }) {
   try {
     await connectDB();
 
-    const { orderNumber } = params;
+    const { orderNumber } = await params;
 
     if (request.method === 'GET') {
       const order = await Order.findOne({ orderNumber })

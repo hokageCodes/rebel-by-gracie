@@ -5,7 +5,7 @@ export async function GET(request, { params }) {
   try {
     await connectDB();
 
-    const { slug } = params;
+    const { slug } = await params;
 
     const product = await Product.findOne({ 
       slug, 

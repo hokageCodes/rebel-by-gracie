@@ -6,7 +6,7 @@ export async function GET(request, { params }) {
   try {
     await connectDB();
 
-    const { orderNumber } = params;
+    const { orderNumber } = await params;
     const user = await getCurrentUser();
 
     const order = await Order.findOne({ orderNumber })

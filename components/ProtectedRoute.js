@@ -11,7 +11,7 @@ export function ProtectedRoute({ children, requireAdmin = false }) {
   useEffect(() => {
     if (!loading) {
       if (!isAuthenticated) {
-        router.push('/login');
+        router.push('/auth/login');
       } else if (requireAdmin && !isAdmin) {
         router.push('/');
       }

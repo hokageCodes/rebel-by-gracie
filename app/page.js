@@ -6,6 +6,7 @@ import PreviousCollections from '../components/sections/PreviousCollections'
 import FAQSection from '../components/sections/FAQSection'
 import NewsletterSection from '../components/sections/NewsletterSection'
 import MasonryGallerySection from '../components/sections/MasonGallery'
+import NewsletterPopup from '../components/NewsletterPopup'
 
 const Home = () => {
   return (
@@ -17,6 +18,7 @@ const Home = () => {
       <FAQSection />
       <MasonryGallerySection />
       <NewsletterSection />
+      <NewsletterPopup />
     </div>
   )
 }

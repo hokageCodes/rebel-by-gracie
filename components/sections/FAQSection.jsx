@@ -38,7 +38,7 @@ export default function FAQSection() {
   }
 
   return (
-    <section className="relative w-full py-20 text-luxury-black">
+    <section className="relative w-full py-20 pt-24 md:pt-32 text-luxury-black">
       <div className="container mx-auto px-6 max-w-4xl">
         {/* Heading */}
         <h2 className="text-3xl md:text-5xl font-serif text-center mb-12">

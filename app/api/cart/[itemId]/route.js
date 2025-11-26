@@ -6,7 +6,7 @@ export async function PUT(request, { params }) {
   try {
     await connectDB();
 
-    const { itemId } = params;
+    const { itemId } = await params;
     const { quantity } = await request.json();
     const user = await getCurrentUser();
     const { searchParams } = new URL(request.url);
@@ -73,7 +73,7 @@ export async function DELETE(request, { params }) {
   try {
     await connectDB();
 
-    const { itemId } = params;
+    const { itemId } = await params;
     const user = await getCurrentUser();
     const { searchParams } = new URL(request.url);
     const sessionId = searchParams.get('sessionId');

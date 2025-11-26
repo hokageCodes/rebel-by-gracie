@@ -18,7 +18,7 @@ export default function FeaturedProduct() {
 
       {/* Content */}
       <div className="relative z-10 max-w-2xl mx-auto px-6">
-        <h2 className="text-4xl md:text-9xl font-serif tracking-wide mb-6">
+        <h2 className="text-4xl sm:text-5xl md:text-7xl lg:text-9xl font-serif tracking-wide mb-6 text-white [text-shadow:_3px_3px_10px_rgb(0_0_0_/_0.9),_0_0_25px_rgb(0_0_0_/_0.6)]">
           The Leather DSLR Bag
         </h2>
         {/* <p className="text-lg md:text-xl text-luxury-cream mb-8">
@@ -26,7 +26,7 @@ export default function FeaturedProduct() {
         </p> */}
         <a
           href="/shop"
-          className="inline-block px-8 py-3 bg-luxury-black text-luxury-cream text-lg font-medium rounded-full shadow-lg hover:bg-luxury-graphite transition"
+          className="inline-block px-8 py-3 bg-[#4a2c23] text-white text-lg font-medium rounded-md shadow-lg hover:bg-[#5a3c33] transition"
         >
           Shop Now
         </a>

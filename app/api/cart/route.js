@@ -57,6 +57,14 @@ export async function POST(request) {
       );
     }
 
+    // Validate productId is a valid MongoDB ObjectId
+    if (!/^[0-9a-fA-F]{24}$/.test(productId)) {
+      return Response.json(
+        { error: 'Invalid product ID format' },
+        { status: 400 }
+      );
+    }
+
     // Get product details
     const product = await Product.findById(productId);
     if (!product || !product.isActive) {

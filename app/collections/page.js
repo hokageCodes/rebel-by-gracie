@@ -32,7 +32,9 @@ export default function CollectionsPage() {
           description: 'Discover our elegant collection of handbags, purses, and accessories designed for the modern woman.',
           href: '/collections/womens',
           products: womensData.products || [],
-          image: 'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=600&h=400&fit=crop',
+          image: womensData.products && womensData.products.length > 0 && womensData.products[0].images && womensData.products[0].images.length > 0 
+            ? womensData.products[0].images[0].url 
+            : '/gallery/1.jpeg',
         },
         {
           id: 'mens',
@@ -40,7 +42,9 @@ export default function CollectionsPage() {
           description: 'Professional briefcases and laptop bags crafted for the discerning gentleman.',
           href: '/collections/mens',
           products: mensData.products || [],
-          image: 'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=600&h=400&fit=crop',
+          image: mensData.products && mensData.products.length > 0 && mensData.products[0].images && mensData.products[0].images.length > 0 
+            ? mensData.products[0].images[0].url 
+            : '/gallery/2.jpeg',
         },
         {
           id: 'travel',
@@ -48,7 +52,9 @@ export default function CollectionsPage() {
           description: 'Premium travel bags and accessories for your adventures, near and far.',
           href: '/collections/travel',
           products: travelData.products || [],
-          image: 'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=600&h=400&fit=crop',
+          image: travelData.products && travelData.products.length > 0 && travelData.products[0].images && travelData.products[0].images.length > 0 
+            ? travelData.products[0].images[0].url 
+            : '/gallery/3.jpeg',
         },
       ]);
     } catch (error) {
@@ -67,12 +73,10 @@ export default function CollectionsPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 py-12">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600 mx-auto"></div>
-            <p className="mt-4 text-gray-600">Loading collections...</p>
-          </div>
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#4a2c23] mx-auto"></div>
+          <p className="mt-4 text-gray-600">Loading collections...</p>
         </div>
       </div>
     );
@@ -81,26 +85,35 @@ export default function CollectionsPage() {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Hero Section */}
-      <div className="bg-gradient-to-r from-primary-600 to-primary-800 text-white py-20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h1 className="text-4xl md:text-6xl font-bold mb-6">Our Collections</h1>
-          <p className="text-xl md:text-2xl text-primary-100 max-w-3xl mx-auto">
-            Discover our carefully curated selection of premium handbags and accessories
-          </p>
+      <div className="relative h-64 md:h-80 lg:h-96 w-full overflow-hidden">
+        <div 
+          className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-60"
+          style={{
+            backgroundImage: "url('/gallery/1.jpeg')",
+          }}
+        />
+        <div className="absolute inset-0 bg-black/30" />
+        <div className="relative z-10 flex items-center justify-center h-full">
+          <div className="text-center px-4">
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white [text-shadow:_2px_2px_8px_rgb(0_0_0_/_0.9)]">
+              Our Collections
+            </h1>
+          </div>
         </div>
       </div>
 
       {/* Collections Grid */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 pt-24 md:pt-32">
         <div className="space-y-16">
           {collections.map((collection) => (
             <div key={collection.id} className="bg-white rounded-2xl shadow-xl overflow-hidden">
               <div className="md:flex">
-                <div className="md:w-1/2">
+                <div className="md:w-1/2 relative h-64 md:h-auto">
                   <Image
                     src={collection.image}
                     alt={collection.name}
-                    className="w-full h-64 md:h-full object-cover"
+                    fill
+                    className="object-cover"
                   />
                 </div>
                 <div className="md:w-1/2 p-8 md:p-12">
@@ -109,7 +122,7 @@ export default function CollectionsPage() {
                     {collection.description}
                   </p>
                   
-                  {collection.products.length > 0 && (
+                  {collection.products.length > 0 ? (
                     <div className="mb-8">
                       <h3 className="text-lg font-semibold text-gray-900 mb-4">Featured Products</h3>
                       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
@@ -120,6 +133,8 @@ export default function CollectionsPage() {
                                 <Image
                                   src={product.images[0].url}
                                   alt={product.name}
+                                  width={96}
+                                  height={96}
                                   className="w-full h-full object-cover"
                                 />
                               ) : (
@@ -131,18 +146,22 @@ export default function CollectionsPage() {
                               )}
                             </div>
                             <p className="text-sm font-medium text-gray-900 truncate">{product.name}</p>
-                            <p className="text-sm text-primary-600 font-semibold">
+                            <p className="text-sm text-[#4a2c23] font-semibold">
                               {formatCurrency(product.price)}
                             </p>
                           </div>
                         ))}
                       </div>
                     </div>
+                  ) : (
+                    <div className="mb-8 text-center py-6 bg-gray-50 rounded-lg">
+                      <p className="text-gray-600">No products available yet in this collection.</p>
+                    </div>
                   )}
                   
                   <Link
                     href={collection.href}
-                    className="inline-flex items-center px-6 py-3 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors font-medium"
+                    className="inline-flex items-center px-6 py-3 bg-[#4a2c23] text-white rounded-md hover:bg-[#5a3c33] transition-colors font-medium"
                   >
                     Explore {collection.name}
                     <svg className="ml-2 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -153,25 +172,6 @@ export default function CollectionsPage() {
               </div>
             </div>
           ))}
-        </div>
-      </div>
-
-      {/* Call to Action */}
-      <div className="bg-gray-900 text-white py-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-3xl font-bold mb-4">Ready to Find Your Perfect Bag?</h2>
-          <p className="text-xl text-gray-300 mb-8 max-w-2xl mx-auto">
-            Browse our complete catalog and discover the perfect accessory for your style
-          </p>
-          <Link
-            href="/"
-            className="inline-flex items-center px-8 py-3 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors font-medium text-lg"
-          >
-            Shop All Products
-            <svg className="ml-2 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-            </svg>
-          </Link>
         </div>
       </div>
     </div>

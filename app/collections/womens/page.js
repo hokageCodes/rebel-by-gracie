@@ -2,14 +2,17 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import Image from 'next/image';
+import { toast } from 'react-toastify';
+import { addToCart } from '@/lib/utils/cart';
 
 export default function WomensCollectionPage() {
+  const searchParams = useSearchParams();
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filters, setFilters] = useState({
-    category: '',
+    category: searchParams.get('category') || '',
     sort: 'newest',
     search: '',
   });
@@ -27,6 +30,14 @@ export default function WomensCollectionPage() {
     { value: 'the-livvy-bag', label: 'The Livvy Bag' },
     { value: 'rg-box-mini', label: 'RG Box Mini' },
   ];
+
+  useEffect(() => {
+    // Update category from URL params if present
+    const categoryFromUrl = searchParams.get('category') || '';
+    if (categoryFromUrl !== filters.category) {
+      setFilters(prev => ({ ...prev, category: categoryFromUrl }));
+    }
+  }, [searchParams]);
 
   useEffect(() => {
     fetchProducts();
@@ -57,36 +68,12 @@ export default function WomensCollectionPage() {
   };
 
   const handleAddToCart = async (productId) => {
-    try {
-      const sessionId = localStorage.getItem('sessionId') || generateSessionId();
-      
-      const response = await fetch('/api/cart', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          productId,
-          quantity: 1,
-          sessionId,
-        }),
-      });
-
-      if (response.ok) {
-        alert('Product added to cart!');
-      } else {
-        alert('Failed to add product to cart');
-      }
-    } catch (error) {
-      console.error('Error adding to cart:', error);
-      alert('Error adding to cart');
+    const result = await addToCart(productId, 1);
+    if (result.success) {
+      toast.success(result.message || 'Product added to cart!');
+    } else {
+      toast.error(result.error || 'Failed to add product to cart');
     }
-  };
-
-  const generateSessionId = () => {
-    const sessionId = Math.random().toString(36).substring(2, 15);
-    localStorage.setItem('sessionId', sessionId);
-    return sessionId;
   };
 
   const formatCurrency = (amount) => {
@@ -98,14 +85,23 @@ export default function WomensCollectionPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Hero Section */}
-     {/* Hero Section */}
-     <div className="bg-gradient-to-r from-pink-600 to-purple-700 text-white py-20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h1 className="text-4xl md:text-6xl font-bold mb-6">Women&apos;s Collection</h1>
-          <p className="text-xl md:text-2xl text-pink-100 max-w-3xl mx-auto">
-            Discover our elegant collection of handbags, purses, and accessories designed for the modern woman
-          </p>
+      {/* Hero Banner with Background Image */}
+      <div className="relative h-64 md:h-80 lg:h-96 w-full overflow-hidden">
+        <div 
+          className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-60"
+          style={{
+            backgroundImage: "url('/gallery/1.jpeg')",
+          }}
+        />
+        <div className="absolute inset-0 bg-black/30" />
+      </div>
+
+      {/* Title Outside and Under Banner */}
+      <div className="bg-white border-b border-gray-200">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 text-center">
+            Women&apos;s Collection
+          </h1>
         </div>
       </div>
 
@@ -142,19 +138,56 @@ export default function WomensCollectionPage() {
         </div>
       </div>
 
+      {/* Filters */}
+      <div className="bg-white border-b border-gray-200">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between space-y-4 md:space-y-0">
+            <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-4">
+              <select
+                value={filters.category}
+                onChange={(e) => setFilters(prev => ({ ...prev, category: e.target.value }))}
+                className="px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-[#4a2c23] focus:border-transparent"
+              >
+                {categories.map((category) => (
+                  <option key={category.value} value={category.value}>
+                    {category.label}
+                  </option>
+                ))}
+              </select>
+
+              <select
+                value={filters.sort}
+                onChange={(e) => setFilters(prev => ({ ...prev, sort: e.target.value }))}
+                className="px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-[#4a2c23] focus:border-transparent"
+              >
+                <option value="newest">Newest First</option>
+                <option value="price-low">Price: Low to High</option>
+                <option value="price-high">Price: High to Low</option>
+                <option value="name">Name A-Z</option>
+              </select>
+            </div>
+
+            <div className="flex-1 max-w-md">
+              <input
+                type="text"
+                placeholder="Search products..."
+                value={filters.search}
+                onChange={(e) => setFilters(prev => ({ ...prev, search: e.target.value }))}
+                className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-[#4a2c23] focus:border-transparent"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+
       {/* Products Grid */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 pt-24 md:pt-32">
         {loading ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {[...Array(8)].map((_, i) => (
-              <div key={i} className="bg-white rounded-lg shadow animate-pulse">
-                <div className="h-64 bg-gray-200 rounded-t-lg"></div>
-                <div className="p-4">
-                  <div className="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
-                  <div className="h-4 bg-gray-200 rounded w-1/2"></div>
-                </div>
-              </div>
-            ))}
+          <div className="flex items-center justify-center min-h-[60vh]">
+            <div className="text-center">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#4a2c23] mx-auto"></div>
+              <p className="mt-4 text-gray-600">Loading products...</p>
+            </div>
           </div>
         ) : (
           <>
@@ -165,12 +198,14 @@ export default function WomensCollectionPage() {
             </div>
 
             {products.length === 0 ? (
-              <div className="text-center py-12">
-                <svg className="w-16 h-16 text-gray-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="text-center py-16">
+                <svg className="w-20 h-20 text-gray-400 mx-auto mb-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
                 </svg>
-                <h3 className="text-lg font-medium text-gray-900 mb-2">No products found</h3>
-                <p className="text-gray-500">Try adjusting your filters or search terms.</p>
+                <h3 className="text-2xl font-semibold text-gray-900 mb-3">No Products Available Yet</h3>
+                <p className="text-lg text-gray-600 max-w-md mx-auto">
+                  We&apos;re working on adding amazing products to this collection. Check back soon!
+                </p>
               </div>
             ) : (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
@@ -178,12 +213,13 @@ export default function WomensCollectionPage() {
                   <div key={product._id} className="bg-white rounded-lg shadow hover:shadow-lg transition-shadow">
                     <Link href={`/products/${product.slug}`}>
                       <div className="relative">
-                        <div className="h-64 bg-gray-200 rounded-t-lg overflow-hidden">
+                        <div className="relative h-64 bg-gray-200 rounded-t-lg overflow-hidden">
                           {product.images && product.images.length > 0 ? (
                             <Image
                               src={product.images[0].url}
                               alt={product.name}
-                              className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+                              fill
+                              className="object-cover hover:scale-105 transition-transform duration-300"
                             />
                           ) : (
                             <div className="w-full h-full flex items-center justify-center">
@@ -227,7 +263,7 @@ export default function WomensCollectionPage() {
                         </div>
                         <button
                           onClick={() => handleAddToCart(product._id)}
-                          className="bg-primary-600 text-white px-4 py-2 rounded-lg hover:bg-primary-700 transition-colors text-sm font-medium"
+                          className="bg-[#4a2c23] text-white px-4 py-2 rounded-md hover:bg-[#5a3c33] transition-colors text-sm font-medium"
                         >
                           Add to Cart
                         </button>

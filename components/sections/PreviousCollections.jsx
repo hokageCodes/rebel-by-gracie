@@ -12,8 +12,8 @@ const previousCollections = [
 
 export default function PreviousCollections() {
   return (
-    <section className="relative w-full py-20">
-      <div className="container mx-auto px-6 max-w-7xl">
+    <section className="relative w-full py-20 pt-24 md:pt-32">
+      <div className="container mx-auto px-2 max-w-7xl">
         {/* Heading */}
         <h2 className="text-3xl md:text-5xl font-serif text-center text-luxury-black mb-12">
           Previous Collections
