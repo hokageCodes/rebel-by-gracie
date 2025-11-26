@@ -1,13 +1,13 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import Image from 'next/image';
 import { addToCart } from '@/lib/utils/cart';
 import { toast } from 'react-toastify';
 
-export default function ShopPage() {
+function ShopPageContent() {
   const searchParams = useSearchParams();
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -329,6 +329,25 @@ export default function ShopPage() {
         )}
       </div>
     </div>
+  );
+}
+
+export default function ShopPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-gray-50 pt-24 md:pt-32">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+          <div className="flex items-center justify-center min-h-[60vh]">
+            <div className="text-center">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#4a2c23] mx-auto"></div>
+              <p className="mt-4 text-gray-600">Loading...</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    }>
+      <ShopPageContent />
+    </Suspense>
   );
 }
 
