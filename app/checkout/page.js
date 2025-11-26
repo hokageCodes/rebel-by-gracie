@@ -165,14 +165,14 @@ export default function CheckoutPage() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Order Form - Takes 2 columns */}
           <div className="lg:col-span-2 space-y-6">
-            {/* Contact Information */}
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-              <div className="flex items-center mb-4">
-                <Mail className="w-5 h-5 text-[#4a2c23] mr-2" />
-                <h2 className="text-xl font-semibold text-gray-900">Contact Information</h2>
-              </div>
-              
-              <form onSubmit={handleSubmit} className="space-y-6">
+            <form onSubmit={handleSubmit} className="space-y-6">
+              {/* Contact Information */}
+              <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                <div className="flex items-center mb-4">
+                  <Mail className="w-5 h-5 text-[#4a2c23] mr-2" />
+                  <h2 className="text-xl font-semibold text-gray-900">Contact Information</h2>
+                </div>
+                
                 {/* Guest Email Collection */}
                 {!isAuthenticated && (
                   <div>
@@ -201,9 +201,10 @@ export default function CheckoutPage() {
                     </p>
                   </div>
                 )}
+              </div>
 
-                {/* Shipping Address */}
-                <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+              {/* Shipping Address */}
+              <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
                   <div className="flex items-center mb-4">
                     <MapPin className="w-5 h-5 text-[#4a2c23] mr-2" />
                     <h3 className="text-xl font-semibold text-gray-900">Shipping Address</h3>
@@ -314,22 +315,22 @@ export default function CheckoutPage() {
                   </div>
                 </div>
 
-                {/* Order Notes */}
-                <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-                  <label htmlFor="notes" className="block text-sm font-medium text-gray-700 mb-2">
-                    Order Notes (Optional)
-                  </label>
-                  <textarea
-                    id="notes"
-                    rows={4}
-                    value={orderNotes}
-                    onChange={(e) => setOrderNotes(e.target.value)}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-[#4a2c23] focus:border-[#4a2c23] transition-colors resize-none"
-                    placeholder="Special delivery instructions or notes for your order"
-                  />
-                </div>
-              </form>
-            </div>
+              {/* Order Notes */}
+              <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                <label htmlFor="notes" className="block text-sm font-medium text-gray-700 mb-2">
+                  Order Notes (Optional)
+                </label>
+                <textarea
+                  id="notes"
+                  rows={4}
+                  value={orderNotes}
+                  onChange={(e) => setOrderNotes(e.target.value)}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-[#4a2c23] focus:border-[#4a2c23] transition-colors resize-none"
+                  placeholder="Special delivery instructions or notes for your order"
+                />
+              </div>
+            </form>
+          </div>
 
           {/* Order Summary - Takes 1 column */}
           <div className="lg:col-span-1">
