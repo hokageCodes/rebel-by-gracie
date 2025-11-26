@@ -1,7 +1,9 @@
 import connectDB from '@/lib/mongodb';
 import Order from '@/lib/models/Order';
 import Cart from '@/lib/models/Cart';
+import User from '@/lib/models/User';
 import { getCurrentUser } from '@/lib/auth';
+import { sendEmail } from '@/lib/email';
 
 export async function GET(request) {
   try {
