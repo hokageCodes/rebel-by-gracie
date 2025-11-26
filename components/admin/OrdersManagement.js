@@ -488,18 +488,27 @@ export default function OrdersManagement() {
                           >
                             View
                           </button>
-                          <select
-                            value={order.orderStatus}
-                            onChange={(e) => handleOrderStatusUpdate(order._id, e.target.value)}
-                            className="text-xs border border-gray-300 rounded px-2 py-1"
-                          >
-                            <option value="pending">Pending</option>
-                            <option value="confirmed">Confirmed</option>
-                            <option value="processing">Processing</option>
-                            <option value="shipped">Shipped</option>
-                            <option value="delivered">Delivered</option>
-                            <option value="cancelled">Cancelled</option>
-                          </select>
+                          {order.orderStatus === 'pending' ? (
+                            <button
+                              onClick={() => handleOrderStatusUpdate(order.orderNumber, 'confirmed')}
+                              className="text-xs bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700 transition-colors font-medium"
+                            >
+                              Confirm Order
+                            </button>
+                          ) : (
+                            <select
+                              value={order.orderStatus}
+                              onChange={(e) => handleOrderStatusUpdate(order.orderNumber, e.target.value)}
+                              className="text-xs border border-gray-300 rounded px-2 py-1"
+                            >
+                              <option value="pending">Pending</option>
+                              <option value="confirmed">Confirmed</option>
+                              <option value="processing">Processing</option>
+                              <option value="shipped">Shipped</option>
+                              <option value="delivered">Delivered</option>
+                              <option value="cancelled">Cancelled</option>
+                            </select>
+                          )}
                         </td>
                       </tr>
                     ))}

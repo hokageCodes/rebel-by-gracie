@@ -70,8 +70,34 @@ export default function CheckoutPage() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     
+    // Validate required fields
+    if (!shippingAddress.firstName || !shippingAddress.lastName) {
+      toast.error('Please fill in your name');
+      return;
+    }
+    
+    if (!shippingAddress.address) {
+      toast.error('Please provide your street address');
+      return;
+    }
+    
+    if (!shippingAddress.city || !shippingAddress.state || !shippingAddress.postalCode) {
+      toast.error('Please complete your address details');
+      return;
+    }
+    
+    if (!shippingAddress.phone) {
+      toast.error('Please provide your phone number');
+      return;
+    }
+    
     if (!isAuthenticated && !guestEmail) {
-      alert('Please provide your email address for order updates');
+      toast.error('Please provide your email address for order updates');
+      return;
+    }
+    
+    if (!cart || !cart.items || cart.items.length === 0) {
+      toast.error('Your cart is empty');
       return;
     }
 
@@ -87,6 +113,8 @@ export default function CheckoutPage() {
         shippingCost: 0, // Free shipping for now
       };
 
+      console.log('Submitting order:', orderData);
+      
       const response = await fetch('/api/orders', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -94,17 +122,26 @@ export default function CheckoutPage() {
       });
 
       const data = await response.json();
+      console.log('Order response:', data);
 
-      if (response.ok) {
-        toast.success('Order placed successfully!');
+      if (response.ok && data.order) {
+        toast.success('Order placed successfully! You will receive a confirmation email shortly.');
+        
         // Clear cart
-        const sessionId = localStorage.getItem('sessionId');
-        await fetch(`/api/cart?sessionId=${sessionId}`, { method: 'DELETE' });
+        try {
+          const sessionId = localStorage.getItem('sessionId');
+          if (sessionId) {
+            await fetch(`/api/cart?sessionId=${sessionId}`, { method: 'DELETE' });
+          }
+        } catch (cartError) {
+          console.error('Error clearing cart:', cartError);
+        }
         
         // Redirect to success page
         router.push(`/order-success?orderNumber=${data.order.orderNumber}`);
       } else {
-        toast.error(data.error || 'Failed to create order');
+        console.error('Order creation failed:', data);
+        toast.error(data.error || 'Failed to create order. Please try again.');
       }
     } catch (error) {
       console.error('Order creation error:', error);
