@@ -382,7 +382,7 @@ export default function ContentManagement() {
                       />
                       {!product.isCustomLink && (
                         <p className="text-xs text-gray-500 mt-1">
-                          🔗 Auto-generated from product name. Click "Auto" to customize.
+                          🔗 Auto-generated from product name. Click Auto to customize.
                         </p>
                       )}
                     </div>
@@ -424,7 +424,7 @@ export default function ContentManagement() {
 
             {(!section.products || section.products.length === 0) && (
               <div className="text-center py-8 text-gray-500">
-                <p>No products added yet. Click "Add Product" to get started.</p>
+                <p>No products added yet. Click Add Product to get started.</p>
               </div>
             )}
           </div>

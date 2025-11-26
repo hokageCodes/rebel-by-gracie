@@ -333,13 +333,13 @@ export default function ProductsManagement() {
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent text-sm"
                     >
                       <option value="">All Categories</option>
-                      <option value="womens-collection">Women's Collection</option>
+                      <option value="womens-collection">Womens Collection</option>
                       <option value="rg-midi-handbag">RG Midi Handbag</option>
                       <option value="rg-mini-handbag">RG Mini Handbag</option>
                       <option value="celia-clutch-purse">Celia Clutch Purse</option>
                       <option value="the-livvy-bag">The Livvy Bag</option>
                       <option value="rg-box-mini">RG Box Mini</option>
-                      <option value="mens-collection">Men's Collection</option>
+                      <option value="mens-collection">Mens Collection</option>
                       <option value="bull-briefcase">Bull Briefcase</option>
                       <option value="classic-laptop-bag">Classic Laptop Bag</option>
                       <option value="travel-collection">Travel Collection</option>
@@ -356,8 +356,8 @@ export default function ProductsManagement() {
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent text-sm"
                     >
                       <option value="">All Collections</option>
-                      <option value="womens">Women's</option>
-                      <option value="mens">Men's</option>
+                      <option value="womens">Womens</option>
+                      <option value="mens">Mens</option>
                       <option value="travel">Travel</option>
                     </select>
                   </div>
