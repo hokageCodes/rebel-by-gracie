@@ -59,6 +59,11 @@ export async function POST(request) {
 
   } catch (error) {
     console.error('Upload API error:', error);
+    console.error('Error details:', {
+      message: error.message,
+      stack: error.stack,
+      name: error.name,
+    });
     
     if (error.message === 'Unauthorized') {
       return NextResponse.json(
@@ -68,7 +73,10 @@ export async function POST(request) {
     }
 
     return NextResponse.json(
-      { error: 'Internal server error' },
+      { 
+        error: error.message || 'Internal server error',
+        details: process.env.NODE_ENV === 'development' ? error.stack : undefined
+      },
       { status: 500 }
     );
   }

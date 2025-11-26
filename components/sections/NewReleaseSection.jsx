@@ -4,67 +4,62 @@ import Link from "next/link"
 import { useState, useEffect } from "react"
 import { motion } from "framer-motion"
 import { ChevronLeft, ChevronRight, ShoppingCart, Eye } from "lucide-react"
-import { generateProductLink } from "../../lib/utils/slugify"
 import { toast } from 'react-toastify'
 import { addToCart } from '../../lib/utils/cart'
 import { isValidObjectId } from '../../lib/utils/validation'
 
-// Default fallback data
-const defaultNewReleases = [
-  { id: 1, src: "/bags/1.jpeg", title: "Vintage Camera Bag", price: "$40.85" },
-  { id: 2, src: "/bags/2.jpeg", title: "Leather DSLR Bag", price: "$52.50" },
-  { id: 3, src: "/bags/3.jpeg", title: "Compact Shoulder Bag", price: "$38.20" },
-  { id: 4, src: "/bags/4.jpeg", title: "Modern Tote Bag", price: "$65.00" },
-  { id: 5, src: "/bags/5.jpeg", title: "Executive Briefcase", price: "$120.00" },
-]
-
 export default function NewReleaseCarousel() {
   const [activeIndex, setActiveIndex] = useState(0)
+  const [products, setProducts] = useState([])
   const [content, setContent] = useState(null)
   const [loading, setLoading] = useState(true)
 
-  // Fetch content from API
+  // Fetch products from backend and content from API
   useEffect(() => {
-    const fetchContent = async () => {
+    const fetchData = async () => {
       try {
-        const response = await fetch('/api/content/home')
-        const data = await response.json()
+        setLoading(true)
         
-        if (data.success && data.content?.sections?.newRelease) {
-          setContent(data.content.sections.newRelease)
+        // Fetch content configuration
+        const contentResponse = await fetch('/api/content/home')
+        const contentData = await contentResponse.json()
+        
+        if (contentData.success && contentData.content?.sections?.newRelease) {
+          setContent(contentData.content.sections.newRelease)
         }
-        // If content not found (404), that's expected - we'll use default content
+
+        // Fetch real products from backend (newest or featured)
+        const productsResponse = await fetch('/api/products?isActive=true&limit=5&sort=newest')
+        const productsData = await productsResponse.json()
+        
+        if (productsData.products && productsData.products.length > 0) {
+          // Filter to only products with valid ObjectIds
+          const validProducts = productsData.products.filter(p => 
+            p._id && isValidObjectId(p._id.toString())
+          )
+          setProducts(validProducts)
+        }
       } catch (error) {
-        console.error('Error fetching new release content:', error)
-        // Don't show toastify error for expected 404 responses
+        console.error('Error fetching new release data:', error)
       } finally {
         setLoading(false)
       }
     }
 
-    fetchContent()
+    fetchData()
   }, [])
 
-  // Use managed content or fallback to default
+  // Use content config or defaults
   const sectionContent = content || {
     title: "New Release",
     subtitle: "Discover our latest handcrafted luxury bags",
     ctaText: "Explore the Shop",
     ctaLink: "/shop",
-    products: defaultNewReleases.map((item, index) => ({
-      id: item.id.toString(),
-      name: item.title,
-      image: { url: item.src, alt: item.title },
-      price: parseFloat(item.price.replace('$', '')),
-      link: generateProductLink(item.title),
-      isCustomLink: false,
-      isActive: true,
-    })),
     isActive: true,
   }
 
-  const activeProducts = sectionContent.products?.filter(product => product.isActive) || []
-  const newReleases = activeProducts.length > 0 ? activeProducts : defaultNewReleases
+  // Only show products with valid ObjectIds from backend
+  const newReleases = products.filter(p => p._id && isValidObjectId(p._id.toString()))
 
   const nextSlide = () =>
     setActiveIndex((prev) => (prev + 1) % newReleases.length)
@@ -97,8 +92,8 @@ export default function NewReleaseCarousel() {
     return "hidden"
   }
 
-  // Don't render if section is disabled
-  if (!sectionContent.isActive) {
+  // Don't render if section is disabled or no products available
+  if (!sectionContent.isActive || newReleases.length === 0) {
     return null
   }
 
@@ -150,14 +145,18 @@ export default function NewReleaseCarousel() {
         >
           {newReleases.map((product, index) => {
             const position = getPosition(index)
-            const productImage = product.image?.url || product.src
-            const productTitle = product.name || product.title
-            const productPrice = product.price ? `$${product.price.toFixed(2)}` : product.price
-            const productLink = product.link || generateProductLink(productTitle)
+            const productImage = product.images && product.images.length > 0 
+              ? product.images[0].url 
+              : '/bags/1.jpeg'
+            const productTitle = product.name
+            const productPrice = product.price ? `$${product.price.toFixed(2)}` : '$0.00'
+            const productSlug = product.slug || product._id?.toString()
+            const productLink = productSlug ? `/products/${productSlug}` : '#'
+            const productId = product._id?.toString() || product._id
 
             return (
               <motion.div
-                key={product.id}
+                key={product._id?.toString() || index}
                 animate={{
                   opacity: position === "hidden" ? 0 : 1,
                   scale: position === "center" ? 1.1 : 0.9,
@@ -178,7 +177,7 @@ export default function NewReleaseCarousel() {
                   <div className="relative w-full h-80">
                     <Image
                       src={productImage}
-                      alt={product.image?.alt || productTitle || "Product"}
+                      alt={product.images?.[0]?.alt || productTitle || "Product"}
                       fill
                       className="object-cover"
                     />
@@ -202,8 +201,7 @@ export default function NewReleaseCarousel() {
                     </Link>
                     <button
                       onClick={(e) => {
-                        const productId = product._id || product.id;
-                        if (productId) {
+                        if (productId && isValidObjectId(productId)) {
                           handleAddToCart(e, productId);
                         } else {
                           toast.error('Product ID not available');

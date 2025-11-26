@@ -214,15 +214,21 @@ function WomensCollectionContent() {
                     <Link href={`/products/${product.slug}`}>
                       <div className="relative">
                         <div className="relative h-64 bg-gray-200 rounded-t-lg overflow-hidden">
-                          {product.images && product.images.length > 0 ? (
+                          {product.images && product.images.length > 0 && product.images[0]?.url ? (
                             <Image
                               src={product.images[0].url}
-                              alt={product.name}
+                              alt={product.name || 'Product image'}
                               fill
+                              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
                               className="object-cover hover:scale-105 transition-transform duration-300"
+                              unoptimized={!product.images[0].url?.includes('cloudinary')}
+                              onError={(e) => {
+                                console.error('Image failed to load:', product.images[0].url);
+                                e.target.style.display = 'none';
+                              }}
                             />
                           ) : (
-                            <div className="w-full h-full flex items-center justify-center">
+                            <div className="w-full h-full flex items-center justify-center absolute inset-0">
                               <svg className="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                               </svg>

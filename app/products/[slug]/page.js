@@ -43,9 +43,15 @@ export default function ProductDetailPage() {
   };
 
   const handleAddToCart = async () => {
-    if (!product?._id) return;
+    if (!product?._id) {
+      toast.error('Product ID not available');
+      return;
+    }
     
-    const result = await addToCart(product._id, quantity);
+    // Convert _id to string if it's an object
+    const productId = typeof product._id === 'string' ? product._id : product._id.toString();
+    
+    const result = await addToCart(productId, quantity);
     if (result.success) {
       toast.success(result.message || 'Product added to cart!');
     } else {

@@ -295,15 +295,27 @@ export default function Navigation() {
                 <Link href="/shop" className="block px-3 py-2 text-base text-secondary-700 hover:text-primary-600 hover:bg-secondary-50 rounded-md transition-colors">
                   Shop
                 </Link>
-                <Link href="/collections/womens" className="block px-3 py-2 text-base text-secondary-700 hover:text-primary-600 hover:bg-secondary-50 rounded-md transition-colors">
-                  Womens Collection
-                </Link>
-                <Link href="/collections/mens" className="block px-3 py-2 text-base text-secondary-700 hover:text-primary-600 hover:bg-secondary-50 rounded-md transition-colors">
-                  Mens Collection
-                </Link>
-                <Link href="/collections/travel" className="block px-3 py-2 text-base text-secondary-700 hover:text-primary-600 hover:bg-secondary-50 rounded-md transition-colors">
-                  Travel Collection
-                </Link>
+                
+                {/* Mobile Collections with Categories */}
+                {collections.map((collection) => (
+                  <div key={collection.name} className="space-y-1">
+                    <Link 
+                      href={collection.href}
+                      className="block px-3 py-2 text-base font-medium text-secondary-800 hover:text-primary-600 hover:bg-secondary-50 rounded-md transition-colors"
+                    >
+                      {collection.name}
+                    </Link>
+                    {collection.categories.map((category) => (
+                      <Link
+                        key={category.name}
+                        href={`/collections/${category.collection}?category=${category.category}`}
+                        className="block px-6 py-1.5 text-sm text-secondary-600 hover:text-primary-600 hover:bg-secondary-50 rounded-md transition-colors"
+                      >
+                        {category.name}
+                      </Link>
+                    ))}
+                  </div>
+                ))}
                 <Link href="/about" className="block px-3 py-2 text-base text-secondary-700 hover:text-primary-600 hover:bg-secondary-50 rounded-md transition-colors">
                   About
                 </Link>
